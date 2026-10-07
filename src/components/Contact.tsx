@@ -3,8 +3,10 @@ import { MapPin, Phone, Mail, Clock, Loader2, CheckCircle } from "lucide-react";
 import { motion } from "framer-motion";
 import { toast } from "sonner";
 
+const API_URL = import.meta.env.VITE_API_URL ?? "http://localhost:3000/api";
+
 const Contact = () => {
-  const [form, setForm] = useState({ nombre: "", email: "", localidad: "", mensaje: "" });
+  const [form, setForm] = useState({ nombre: "", email: "", localidad: "", mensaje: "", sitio: "" });
   const [sending, setSending] = useState(false);
   const [sent, setSent] = useState(false);
 
@@ -20,23 +22,26 @@ const Contact = () => {
     setSending(true);
 
     try {
-      const res = await fetch("https://formspree.io/f/xwpkgjvr", {
+      const res = await fetch(`${API_URL}/consultas`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          name: form.nombre,
+          nombre: form.nombre,
           email: form.email,
-          localidad: form.localidad,
-          message: form.mensaje,
+          localidad: form.localidad || undefined,
+          mensaje: form.mensaje,
+          sitio: form.sitio || undefined,
         }),
       });
 
       if (res.ok) {
         setSent(true);
-        setForm({ nombre: "", email: "", localidad: "", mensaje: "" });
+        setForm({ nombre: "", email: "", localidad: "", mensaje: "", sitio: "" });
         toast.success("¡Mensaje enviado con éxito!");
       } else {
-        throw new Error("Error en el envío");
+        const data = await res.json().catch(() => null);
+        const message = Array.isArray(data?.message) ? data.message.join(" ") : data?.message;
+        toast.error(message || "Hubo un error al enviar. Intentá de nuevo.");
       }
     } catch {
       toast.error("Hubo un error al enviar. Intentá de nuevo.");
@@ -87,6 +92,16 @@ const Contact = () => {
                 className="w-full border border-border bg-pearl px-4 py-3 text-foreground placeholder:text-muted-foreground text-sm focus:outline-none focus:border-primary transition-colors"
               />
             ))}
+            <input
+              type="text"
+              name="sitio"
+              tabIndex={-1}
+              autoComplete="off"
+              aria-hidden="true"
+              value={form.sitio}
+              onChange={(e) => setForm({ ...form, sitio: e.target.value })}
+              className="hidden"
+            />
             <textarea
               placeholder="Mensaje"
               rows={5}
