@@ -31,6 +31,19 @@ const Footer = () => {
         <p className="text-cement text-xs">
           © 2024 Barriola Constructora. Todos los derechos reservados.
         </p>
+
+        <p className="text-cement/70 text-xs -mt-3">
+          Desarrollado por{" "}
+          <a
+            href="https://www.codigonortesoluciones.com"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="font-semibold text-cement hover:text-primary transition-colors"
+          >
+            CNS
+          </a>
+          . Todos los derechos reservados.
+        </p>
       </div>
     </motion.footer>
   );
